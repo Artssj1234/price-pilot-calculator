@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -38,7 +37,7 @@ const formSchema = z.object({
   coste: z.coerce.number().min(0, "El coste debe ser un número positivo"),
   envio: z.coerce.number().nullable().optional(),
   iva: z.coerce.number().min(0, "El IVA debe ser un número positivo"),
-  beneficio: z.coerce.number().min(0, "El beneficio debe ser un número positivo"),
+  mano_obra: z.coerce.number().min(0, "El coste de mano de obra debe ser un número positivo"),
   links: z.array(
     z.object({
       nombre: z.string().min(1, "El nombre del enlace es obligatorio"),
@@ -69,14 +68,13 @@ export function ProductForm({
   const [newCategory, setNewCategory] = useState("");
   const [showNewCategory, setShowNewCategory] = useState(false);
 
-  // Valores iniciales del formulario
   const defaultValues: Partial<ProductFormValues> = {
     nombre: product?.nombre || "",
     categoria: product?.categoria || "",
     coste: product?.coste || 0,
     envio: product?.envio || null,
     iva: product?.iva || 21,
-    beneficio: product?.beneficio || 30,
+    mano_obra: product?.mano_obra || 0,
     links: product?.links || [],
   };
 
@@ -85,7 +83,6 @@ export function ProductForm({
     defaultValues,
   });
 
-  // Actualizar los valores del formulario cuando cambia el producto
   useEffect(() => {
     if (product) {
       form.reset({
@@ -94,14 +91,13 @@ export function ProductForm({
         coste: product.coste,
         envio: product.envio,
         iva: product.iva,
-        beneficio: product.beneficio,
+        mano_obra: product.mano_obra,
         links: product.links,
       });
       setLinks(product.links || []);
     }
   }, [product, form]);
 
-  // Manejar adición de link
   const handleAddLink = () => {
     if (newLink.nombre && newLink.url) {
       setLinks([...links, newLink]);
@@ -109,14 +105,12 @@ export function ProductForm({
     }
   };
 
-  // Manejar eliminación de link
   const handleRemoveLink = (index: number) => {
     const updatedLinks = [...links];
     updatedLinks.splice(index, 1);
     setLinks(updatedLinks);
   };
 
-  // Manejar creación de categoría
   const handleCreateCategory = () => {
     if (newCategory) {
       onCreateCategory(newCategory);
@@ -129,36 +123,30 @@ export function ProductForm({
     }
   };
 
-  // Manejar envío del formulario
   const onSubmit = async (values: ProductFormValues) => {
     try {
-      // Asegurarse de que todos los campos requeridos estén presentes
       const productData = {
         nombre: values.nombre,
         categoria: values.categoria,
         coste: values.coste,
         envio: values.envio ?? null,
         iva: values.iva,
-        beneficio: values.beneficio,
+        mano_obra: values.mano_obra,
         links: links,
       };
 
-      if (product) {
-        // Actualizar producto existente
-        await updateProduct({
-          id: product.id,
-          ...productData,
-        });
+      if (product?.id) {
+        await updateProduct({ id: product.id, ...productData });
         toast("Producto actualizado", {
           description: `El producto "${values.nombre}" ha sido actualizado.`,
         });
       } else {
-        // Crear nuevo producto
         await createProduct(productData);
         toast("Producto creado", {
           description: `El producto "${values.nombre}" ha sido creado.`,
         });
       }
+
       onSuccess();
     } catch (error) {
       console.error("Error saving product:", error);
@@ -308,10 +296,10 @@ export function ProductForm({
 
               <FormField
                 control={form.control}
-                name="beneficio"
+                name="mano_obra"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Beneficio (%)</FormLabel>
+                    <FormLabel>Mano de obra (€)</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
