@@ -37,7 +37,7 @@ const formSchema = z.object({
   coste: z.coerce.number().min(0, "El coste debe ser un número positivo"),
   envio: z.coerce.number().nullable().optional(),
   iva: z.coerce.number().min(0, "El IVA debe ser un número positivo"),
-  mano_obra: z.coerce.number().min(0, "El coste de mano de obra debe ser un número positivo"),
+  mano_obra: z.coerce.number().min(0, "La mano de obra debe ser un número positivo"),
   links: z.array(
     z.object({
       nombre: z.string().min(1, "El nombre del enlace es obligatorio"),
@@ -74,7 +74,7 @@ export function ProductForm({
     coste: product?.coste || 0,
     envio: product?.envio || null,
     iva: product?.iva || 21,
-    mano_obra: product?.mano_obra || 0,
+    mano_obra: (product as any)?.mano_obra || 0,
     links: product?.links || [],
   };
 
@@ -91,7 +91,7 @@ export function ProductForm({
         coste: product.coste,
         envio: product.envio,
         iva: product.iva,
-        mano_obra: product.mano_obra,
+        mano_obra: (product as any).mano_obra,
         links: product.links,
       });
       setLinks(product.links || []);
@@ -135,18 +135,20 @@ export function ProductForm({
         links: links,
       };
 
-      if (product?.id) {
-        await updateProduct({ id: product.id, ...productData });
+      if (product) {
+        await updateProduct({
+          id: product.id,
+          ...productData,
+        });
         toast("Producto actualizado", {
           description: `El producto "${values.nombre}" ha sido actualizado.`,
         });
       } else {
-        await createProduct(productData);
+        await createProduct(productData as any);
         toast("Producto creado", {
           description: `El producto "${values.nombre}" ha sido creado.`,
         });
       }
-
       onSuccess();
     } catch (error) {
       console.error("Error saving product:", error);
@@ -262,17 +264,17 @@ export function ProductForm({
                 name="envio"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Coste de envío (€) (opcional)</FormLabel>
+                    <FormLabel>Coste de envío (€)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
-                        {...field}
                         value={field.value || ""}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          field.onChange(value === "" ? null : Number(value));
-                        }}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? null : Number(e.target.value)
+                          )
+                        }
                       />
                     </FormControl>
                     <FormMessage />
