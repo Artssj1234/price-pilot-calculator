@@ -1,7 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
 
-// Tipos para nuestra tabla de productos
 export type ProductLink = {
   nombre: string;
   url: string;
@@ -18,7 +17,6 @@ export type Product = {
   links: ProductLink[];
 };
 
-// Funciones para interactuar con la tabla de productos
 export async function fetchProducts() {
   const { data, error } = await supabase
     .from('productos')
@@ -29,7 +27,6 @@ export async function fetchProducts() {
     return [];
   }
 
-  // Transformar los datos para que coincidan con el tipo Product
   return (data || []).map(item => ({
     ...item,
     links: Array.isArray(item.links)
@@ -39,7 +36,7 @@ export async function fetchProducts() {
         }))
       : [],
     iva: item.iva || 0,
-    envio: item.envio ?? 0,
+    envio: item.envio || 0,
     mano_obra: item.mano_obra || 0,
   })) as Product[];
 }
@@ -55,7 +52,6 @@ export async function fetchCategories() {
     return [];
   }
 
-  // Eliminar duplicados
   const categories = data.map(item => item.categoria);
   return [...new Set(categories)];
 }
@@ -75,19 +71,18 @@ export async function createProduct(product: Omit<Product, 'id'>) {
 }
 
 export async function updateProduct(product: Product) {
-  const { id, ...rest } = product;
-
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('productos')
-    .update(rest)
-    .eq('id', id);
+    .update(product)
+    .match({ id: product.id })
+    .select();
 
   if (error) {
     console.error('Error updating product:', error);
     throw error;
   }
 
-  return true;
+  return data?.[0];
 }
 
 export async function deleteProduct(id: string) {
