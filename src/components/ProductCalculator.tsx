@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,27 +27,25 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
   const [open, setOpen] = useState(false);
   const [coste, setCoste] = useState(product.coste);
   const [envio, setEnvio] = useState(product.envio || 0);
+  const [manoObra, setManoObra] = useState(product.mano_obra || 0);
   const [iva, setIva] = useState(product.iva);
-  const [beneficio, setBeneficio] = useState(product.beneficio);
   const [precioFinal, setPrecioFinal] = useState(0);
 
-  // Calcular precio final
   const calcularPrecioFinal = () => {
-    return (coste + envio) * (1 + iva / 100) * (1 + beneficio / 100);
+    const base = coste + envio + manoObra;
+    return base * (1 + iva / 100);
   };
 
-  // Actualizar precio final cuando cambian los valores
   useEffect(() => {
     setPrecioFinal(calcularPrecioFinal());
-  }, [coste, envio, iva, beneficio]);
+  }, [coste, envio, manoObra, iva]);
 
-  // Actualizar valores cuando cambia el producto
   useEffect(() => {
     if (product) {
       setCoste(product.coste);
       setEnvio(product.envio || 0);
+      setManoObra(product.mano_obra || 0);
       setIva(product.iva);
-      setBeneficio(product.beneficio);
     }
   }, [product]);
 
@@ -89,6 +86,15 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
                 />
               </div>
               <div className="space-y-2">
+                <label className="text-sm font-medium">Mano de obra (€)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={manoObra}
+                  onChange={(e) => setManoObra(Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium">IVA (%)</label>
                 <Input
                   type="number"
@@ -97,29 +103,16 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
                   onChange={(e) => setIva(Number(e.target.value))}
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Beneficio (%)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={beneficio}
-                  onChange={(e) => setBeneficio(Number(e.target.value))}
-                />
-              </div>
             </div>
 
-            <div className="border-t pt-4 mt-4">
+            <div className="border-t pt-4 mt-4 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="font-medium">Precio de coste + envío:</span>
-                <span>{(coste + envio).toFixed(2)} €</span>
+                <span className="font-medium">Subtotal (coste + envío + mano de obra):</span>
+                <span>{(coste + envio + manoObra).toFixed(2)} €</span>
               </div>
-              <div className="flex justify-between items-center mt-2">
-                <span className="font-medium">Con IVA ({iva}%):</span>
-                <span>{((coste + envio) * (1 + iva / 100)).toFixed(2)} €</span>
-              </div>
-              <div className="flex justify-between items-center mt-2 text-lg">
-                <span className="font-bold">Precio final (con {beneficio}% beneficio):</span>
-                <span className="font-bold">{precioFinal.toFixed(2)} €</span>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Precio con IVA:</span>
+                <span>{precioFinal.toFixed(2)} €</span>
               </div>
             </div>
           </CardContent>
@@ -131,4 +124,3 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
     </Dialog>
   );
 }
-
