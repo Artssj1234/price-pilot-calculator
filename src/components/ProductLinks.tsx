@@ -24,6 +24,10 @@ export function ProductLinks({ product, buttonVariant = "outline" }: ProductLink
     return null;
   }
 
+  const handleLinkClick = (url: string) => {
+    window.location.href = url;
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -40,14 +44,13 @@ export function ProductLinks({ product, buttonVariant = "outline" }: ProductLink
           {product.links.map((link, index) => (
             <div key={index} className="flex justify-between items-center p-2 border rounded-md">
               <span className="font-medium">{link.nombre}</span>
-              <a
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button 
+                variant="link" 
+                onClick={() => handleLinkClick(link.url)}
                 className="text-blue-600 hover:underline"
               >
                 Abrir enlace
-              </a>
+              </Button>
             </div>
           ))}
         </div>

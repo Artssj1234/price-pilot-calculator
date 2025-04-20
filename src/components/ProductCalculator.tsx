@@ -57,7 +57,7 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
       <DialogTrigger asChild>
         <Button variant={buttonVariant}>
           <Calculator className="h-4 w-4 mr-2" />
-          Calculadora
+          Ver Precio
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -131,3 +131,4 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
     </Dialog>
   );
 }
+
