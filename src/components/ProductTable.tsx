@@ -48,8 +48,8 @@ export function ProductTable({
 }: ProductTableProps) {
   const [filter, setFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
-  // Filtrar productos por nombre y categoría
   const filteredProducts = products.filter((product) => {
     const matchesName = product.nombre
       .toLowerCase()
@@ -59,7 +59,6 @@ export function ProductTable({
     return matchesName && matchesCategory;
   });
 
-  // Manejar eliminación de producto
   const handleDeleteProduct = async () => {
     if (productToDelete) {
       try {
@@ -78,6 +77,12 @@ export function ProductTable({
     }
   };
 
+  const calcularPrecioFinal = (product: Product) => {
+    const totalCoste = product.coste + (product.envio || 0) + (product.mano_obra || 0);
+    const iva = (totalCoste * product.iva) / 100;
+    return totalCoste + iva;
+  };
+
   return (
     <div className="w-full">
       <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -89,10 +94,7 @@ export function ProductTable({
           />
         </div>
         <div className="w-full md:w-64">
-          <Select
-            value={categoryFilter}
-            onValueChange={setCategoryFilter}
-          >
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger>
               <SelectValue placeholder="Todas las categorías" />
             </SelectTrigger>
@@ -114,7 +116,7 @@ export function ProductTable({
             <TableRow>
               <TableHead>Nombre</TableHead>
               <TableHead>Categoría</TableHead>
-              <TableHead>Coste (€)</TableHead>
+              <TableHead>Precio final (€)</TableHead>
               <TableHead className="text-center">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -130,15 +132,17 @@ export function ProductTable({
                 <TableRow key={product.id}>
                   <TableCell className="font-medium">{product.nombre}</TableCell>
                   <TableCell>{product.categoria}</TableCell>
-                  <TableCell>{product.coste.toFixed(2)}</TableCell>
+                  <TableCell>
+                    {calcularPrecioFinal(product).toFixed(2)} €
+                    <div className="text-muted-foreground text-sm">
+                      Coste: {product.coste.toFixed(2)} €
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <div className="flex justify-center gap-2">
                       <ProductCalculator product={product} buttonVariant="outline" />
                       <ProductLinks product={product} />
-                      <Button
-                        variant="outline"
-                        onClick={() => onEdit(product)}
-                      >
+                      <Button variant="outline" onClick={() => onEdit(product)}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <AlertDialog>
@@ -152,19 +156,14 @@ export function ProductTable({
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Eliminar producto
-                            </AlertDialogTitle>
+                            <AlertDialogTitle>Eliminar producto</AlertDialogTitle>
                             <AlertDialogDescription>
                               ¿Estás seguro de que deseas eliminar el producto "
-                              {productToDelete?.nombre}"? Esta acción no se puede
-                              deshacer.
+                              {productToDelete?.nombre}"? Esta acción no se puede deshacer.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel
-                              onClick={() => setProductToDelete(null)}
-                            >
+                            <AlertDialogCancel onClick={() => setProductToDelete(null)}>
                               Cancelar
                             </AlertDialogCancel>
                             <AlertDialogAction onClick={handleDeleteProduct}>
