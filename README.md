@@ -1,73 +1,75 @@
-# Welcome to your Lovable project
+# Price Pilot - Calculadora de Precios
 
-## Project info
+Price Pilot es una aplicación web profesional y sencilla que permite gestionar productos o servicios y calcular fácilmente su precio final.
 
-**URL**: https://lovable.dev/projects/6fe5069e-b269-4425-ae41-4b8f5e66bb53
+## Funcionalidades
 
-## How can I edit this code?
+- Registro de productos/servicios con todos los campos necesarios
+- Visualización en tabla con filtros por categoría y búsqueda por nombre
+- Calculadora de precio final que se actualiza en tiempo real
+- Edición y eliminación de productos existentes
+- Persistencia completa en Supabase
 
-There are several ways of editing your application.
+## Configuración
 
-**Use Lovable**
+Este proyecto utiliza Supabase como backend. Para configurarlo:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6fe5069e-b269-4425-ae41-4b8f5e66bb53) and start prompting.
+1. Crea una cuenta y un proyecto en [Supabase](https://supabase.com/)
+2. Crea una tabla llamada `productos` con la siguiente estructura:
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```sql
+CREATE TABLE productos (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  nombre TEXT NOT NULL,
+  categoria TEXT NOT NULL,
+  coste NUMERIC NOT NULL,
+  envio NUMERIC,
+  iva NUMERIC NOT NULL DEFAULT 21,
+  beneficio NUMERIC NOT NULL DEFAULT 30,
+  links JSONB DEFAULT '[]'::jsonb
+);
 ```
 
-**Edit a file directly in GitHub**
+3. Copia tu URL de Supabase y tu clave anon en un archivo `.env` basado en el archivo `.env.example`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
+## Tecnologías
 
 - Vite
 - TypeScript
 - React
+- Supabase
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Ejecución Local
 
-Simply open [Lovable](https://lovable.dev/projects/6fe5069e-b269-4425-ae41-4b8f5e66bb53) and click on Share -> Publish.
+```bash
+# Instalar dependencias
+npm install
 
-## Can I connect a custom domain to my Lovable project?
+# Crear archivo .env con las credenciales de Supabase
+cp .env.example .env
+# Edita el archivo .env con tus credenciales
 
-Yes, you can!
+# Iniciar servidor de desarrollo
+npm run dev
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+# Construir para producción
+npm run build
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Fórmula de Cálculo
+
+El precio final se calcula usando la siguiente fórmula:
+
+```
+Precio final = (coste + envío) * (1 + IVA%) * (1 + beneficio%)
+```
+
+## Cómo Usar
+
+1. Añade productos usando el botón "Nuevo Producto"
+2. Filtra productos por categoría o busca por nombre
+3. Usa la calculadora para ver y ajustar el precio final
+4. Edita o elimina productos según sea necesario
+5. Accede a los enlaces de proveedores guardados
