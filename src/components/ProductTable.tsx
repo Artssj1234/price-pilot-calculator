@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,8 +47,7 @@ export function ProductTable({
   onDelete,
 }: ProductTableProps) {
   const [filter, setFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   // Filtrar productos por nombre y categoría
   const filteredProducts = products.filter((product) => {
@@ -57,7 +55,7 @@ export function ProductTable({
       .toLowerCase()
       .includes(filter.toLowerCase());
     const matchesCategory =
-      categoryFilter === "" || product.categoria === categoryFilter;
+      categoryFilter === "all" || product.categoria === categoryFilter;
     return matchesName && matchesCategory;
   });
 

@@ -32,7 +32,15 @@ export async function fetchProducts() {
   // Transform the data to match our Product type
   return (data || []).map(item => ({
     ...item,
-    links: Array.isArray(item.links) ? item.links : [],
+    links: Array.isArray(item.links) 
+      ? item.links.map((link: any) => ({
+          nombre: link.nombre || '',
+          url: link.url || ''
+        }))
+      : [],
+    beneficio: item.beneficio || 0,
+    iva: item.iva || 0,
+    envio: item.envio || 0,
   })) as Product[];
 }
 
