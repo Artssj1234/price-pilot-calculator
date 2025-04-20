@@ -1,5 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 // Tipos para nuestra tabla de productos
 export type ProductLink = {
@@ -29,7 +29,11 @@ export async function fetchProducts() {
     return [];
   }
   
-  return data || [];
+  // Transform the data to match our Product type
+  return (data || []).map(item => ({
+    ...item,
+    links: Array.isArray(item.links) ? item.links : [],
+  })) as Product[];
 }
 
 export async function fetchCategories() {
