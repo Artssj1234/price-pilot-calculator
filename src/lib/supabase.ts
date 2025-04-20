@@ -1,11 +1,5 @@
 
-import { createClient } from '@supabase/supabase-js';
-
-// Estas URL y clave anon deberían ser reemplazadas con las tuyas de Supabase
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '@/integrations/supabase/client';
 
 // Tipos para nuestra tabla de productos
 export type ProductLink = {
