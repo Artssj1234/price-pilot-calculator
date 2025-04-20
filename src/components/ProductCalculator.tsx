@@ -27,25 +27,26 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
   const [open, setOpen] = useState(false);
   const [coste, setCoste] = useState(product.coste);
   const [envio, setEnvio] = useState(product.envio || 0);
-  const [manoObra, setManoObra] = useState(product.mano_obra || 0);
   const [iva, setIva] = useState(product.iva);
+  const [manoObra, setManoObra] = useState((product as any).mano_obra || 0);
   const [precioFinal, setPrecioFinal] = useState(0);
 
+  // Calcular precio final con mano de obra fija
   const calcularPrecioFinal = () => {
-    const base = coste + envio + manoObra;
-    return base * (1 + iva / 100);
+    const subtotal = coste + envio + manoObra;
+    return subtotal * (1 + iva / 100);
   };
 
   useEffect(() => {
     setPrecioFinal(calcularPrecioFinal());
-  }, [coste, envio, manoObra, iva]);
+  }, [coste, envio, iva, manoObra]);
 
   useEffect(() => {
     if (product) {
       setCoste(product.coste);
       setEnvio(product.envio || 0);
-      setManoObra(product.mano_obra || 0);
       setIva(product.iva);
+      setManoObra((product as any).mano_obra || 0);
     }
   }, [product]);
 
@@ -106,12 +107,12 @@ export function ProductCalculator({ product, buttonVariant = "default" }: Produc
             </div>
 
             <div className="border-t pt-4 mt-4 space-y-2">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between">
                 <span className="font-medium">Subtotal (coste + envío + mano de obra):</span>
                 <span>{(coste + envio + manoObra).toFixed(2)} €</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Precio con IVA:</span>
+              <div className="flex justify-between">
+                <span className="font-medium">Con IVA ({iva}%):</span>
                 <span>{precioFinal.toFixed(2)} €</span>
               </div>
             </div>
